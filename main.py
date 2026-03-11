@@ -1,13 +1,10 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from transformers import pipeline
+import requests
 
 app = FastAPI()
 
-summarizer = pipeline(
-    "text-generation",
-    model="google/flan-t5-base"
-)
+API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
 
 class Text(BaseModel):
     text: str
@@ -19,12 +16,11 @@ def home():
 @app.post("/summarize")
 def summarize(data: Text):
 
-    prompt = f"Summarize this text: {data.text}"
+    payload = {
+        "inputs": data.text
+    }
 
-    result = summarizer(
-        prompt,
-        max_length=100,
-        do_sample=False
-    )
+    response = requests.post(API_URL, json=payload)
+    result = response.json()
 
-    return {"summary": result[0]["generated_text"]}
+    return {"summary": result[0]["summary_text"]}
