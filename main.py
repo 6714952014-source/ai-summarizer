@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import requests
 
@@ -11,7 +12,7 @@ class Text(BaseModel):
 
 @app.get("/")
 def home():
-    return {"message": "AI Summarizer Running"}
+    return FileResponse("index.html")
 
 @app.post("/summarize")
 def summarize(data: Text):
